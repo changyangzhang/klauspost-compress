@@ -1,4 +1,4 @@
-module github.com/klauspost/compress
+module github.com/changyangzhang/klauspost-compress
 
 go 1.18
 
