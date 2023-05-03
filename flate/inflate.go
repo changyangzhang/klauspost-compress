@@ -784,10 +784,12 @@ func NewReaderDict(r io.Reader, dict []byte) io.ReadCloser {
 	fixedHuffmanDecoderInit()
 
 	var f decompressor
+	f.step = func(d *decompressor) {
+		d.nextBlock()
+	}
 	f.r = makeReader(r)
 	f.bits = new([maxNumLit + maxNumDist]int)
 	f.codebits = new([numCodes]int)
-	f.step = (*decompressor).nextBlock
 	f.dict.init(maxMatchOffset, dict)
 	return &f
 }
