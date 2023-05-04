@@ -172,11 +172,7 @@ func statelessEnc(dst *tokens, src []byte, startAt int16) {
 		minNonLiteralBlockSize = 1 + 1 + inputMargin
 	)
 
-	type tableEntry struct {
-		offset int16
-	}
-
-	var table [slTableSize]tableEntry
+	var table [slTableSize]int16
 
 	// This check isn't in the Snappy implementation, but there, the caller
 	// instead of the callee handles this case.
@@ -190,8 +186,7 @@ func statelessEnc(dst *tokens, src []byte, startAt int16) {
 	if startAt > 0 {
 		cv := load3232(src, 0)
 		for i := int16(0); i < startAt; i++ {
-			tb := tableEntry{offset: i}
-			table[hashSL(cv)] = tb
+			table[hashSL(cv)] = i
 			cv = (cv >> 8) | (uint32(src[i+4]) << 24)
 		}
 	}
@@ -211,7 +206,7 @@ func statelessEnc(dst *tokens, src []byte, startAt int16) {
 		const doEvery = 2
 
 		nextS := s
-		var candidate tableEntry
+		var candidate int16
 		for {
 			nextHash := hashSL(cv)
 			candidate = table[nextHash]
@@ -221,11 +216,11 @@ func statelessEnc(dst *tokens, src []byte, startAt int16) {
 			}
 
 			now := load6416(src, nextS)
-			table[nextHash] = tableEntry{offset: s}
+			table[nextHash] = s
 			nextHash = hashSL(uint32(now))
 
-			if cv == load3216(src, candidate.offset) {
-				table[nextHash] = tableEntry{offset: nextS}
+			if cv == load3216(src, candidate) {
+				table[nextHash] = nextS
 				break
 			}
 
@@ -235,10 +230,10 @@ func statelessEnc(dst *tokens, src []byte, startAt int16) {
 			nextS++
 			candidate = table[nextHash]
 			now >>= 8
-			table[nextHash] = tableEntry{offset: s}
+			table[nextHash] = s
 
-			if cv == load3216(src, candidate.offset) {
-				table[nextHash] = tableEntry{offset: nextS}
+			if cv == load3216(src, candidate) {
+				table[nextHash] = nextS
 				break
 			}
 			cv = uint32(now)
@@ -253,7 +248,7 @@ func statelessEnc(dst *tokens, src []byte, startAt int16) {
 			// literal bytes prior to s.
 
 			// Extend the 4-byte match as long as possible.
-			t := candidate.offset
+			t := candidate
 			l := int16(matchLen(src[s+4:], src[t+4:]) + 4)
 
 			// Extend backwards
@@ -294,13 +289,13 @@ func statelessEnc(dst *tokens, src []byte, startAt int16) {
 			x := load6416(src, s-2)
 			o := s - 2
 			prevHash := hashSL(uint32(x))
-			table[prevHash] = tableEntry{offset: o}
+			table[prevHash] = o
 			x >>= 16
 			currHash := hashSL(uint32(x))
 			candidate = table[currHash]
-			table[currHash] = tableEntry{offset: o + 2}
+			table[currHash] = o + 2
 
-			if uint32(x) != load3216(src, candidate.offset) {
+			if uint32(x) != load3216(src, candidate) {
 				cv = uint32(x >> 8)
 				s++
 				break
