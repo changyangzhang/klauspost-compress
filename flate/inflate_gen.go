@@ -466,7 +466,7 @@ readLiteral:
 			extra |= fb & bitMask32[nb]
 			fb >>= nb & regSizeMaskUint32
 			fnb -= nb
-			dist = 1<<((nb+1)&regSizeMaskUint32) + 1 + extra
+			dist = uint32(1<<((nb+1)&regSizeMaskUint32) + 1 + extra)
 			// slower: dist = bitMask32[nb+1] + 2 + extra
 		default:
 			f.b, f.nb = fb, fnb
@@ -717,7 +717,7 @@ readLiteral:
 			extra |= fb & bitMask32[nb]
 			fb >>= nb & regSizeMaskUint32
 			fnb -= nb
-			dist = 1<<((nb+1)&regSizeMaskUint32) + 1 + extra
+			dist = uint32(1<<((nb+1)&regSizeMaskUint32) + 1 + extra)
 			// slower: dist = bitMask32[nb+1] + 2 + extra
 		default:
 			f.b, f.nb = fb, fnb
@@ -968,7 +968,7 @@ readLiteral:
 			extra |= fb & bitMask32[nb]
 			fb >>= nb & regSizeMaskUint32
 			fnb -= nb
-			dist = 1<<((nb+1)&regSizeMaskUint32) + 1 + extra
+			dist = uint32(1<<((nb+1)&regSizeMaskUint32) + 1 + extra)
 			// slower: dist = bitMask32[nb+1] + 2 + extra
 		default:
 			f.b, f.nb = fb, fnb
@@ -1219,7 +1219,7 @@ readLiteral:
 			extra |= fb & bitMask32[nb]
 			fb >>= nb & regSizeMaskUint32
 			fnb -= nb
-			dist = 1<<((nb+1)&regSizeMaskUint32) + 1 + extra
+			dist = uint32(1<<((nb+1)&regSizeMaskUint32) + 1 + extra)
 			// slower: dist = bitMask32[nb+1] + 2 + extra
 		default:
 			f.b, f.nb = fb, fnb
