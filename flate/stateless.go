@@ -190,7 +190,8 @@ func statelessEnc(dst *tokens, src []byte, startAt int16) {
 	if startAt > 0 {
 		cv := load3232(src, 0)
 		for i := int16(0); i < startAt; i++ {
-			table[hashSL(cv)] = tableEntry{offset: i}
+			tb := tableEntry{offset: i}
+			table[hashSL(cv)] = tb
 			cv = (cv >> 8) | (uint32(src[i+4]) << 24)
 		}
 	}
